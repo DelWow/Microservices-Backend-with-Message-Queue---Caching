@@ -1,0 +1,22 @@
+{
+  "name": "@microservices/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "clean": "tsc --build tsconfig.json --clean",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  }
+}

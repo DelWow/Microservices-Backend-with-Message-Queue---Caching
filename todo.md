@@ -38,13 +38,14 @@
 - [x] Create a strict shared TypeScript configuration.
 - [x] Configure ESLint for TypeScript.
 - [x] Configure Prettier and formatting exclusions.
-- [ ] Configure the test runner and coverage thresholds.
-- [ ] Create workspace directories for Order Service, Notification Service, and shared packages.
+- [x] Configure the test runner and coverage thresholds.
+- [x] Create workspace directories for Order Service, Notification Service, and shared packages.
 - [x] Add `.gitignore` entries for dependencies, builds, coverage, logs, secrets, and load-test output.
-- [ ] Add `.env.example` with documented non-secret local defaults.
-- [ ] Add a root license if requested.
+- [x] Add `.env.example` with documented non-secret local defaults.
+- [x] Add a root license if requested.
+  - Not requested; no license terms were assumed and no `LICENSE` file was added.
 - [x] Verify dependency installation succeeds.
-- [ ] Verify the empty workspace builds, lints, and type-checks.
+- [x] Verify the empty workspace builds, lints, and type-checks.
 
 ## 3. Define shared contracts and infrastructure helpers
 

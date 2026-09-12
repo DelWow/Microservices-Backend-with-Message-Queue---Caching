@@ -2,6 +2,7 @@
   "name": "microservices-backend-message-queue-caching",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "A production-minded TypeScript microservices demo with PostgreSQL, Redis, RabbitMQ, and OpenTelemetry.",
   "engines": {
     "node": ">=24.0.0",
@@ -19,15 +20,20 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "npm run test --workspaces --if-present",
-    "test:coverage": "npm run test:coverage --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "npm run typecheck:root && npm run typecheck:workspaces",
+    "typecheck:root": "tsc --project tsconfig.json --noEmit",
+    "typecheck:workspaces": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@types/node": "^22.20.2",
+    "@vitest/coverage-v8": "^5.0.0",
     "eslint": "10.10.0",
     "prettier": "3.9.6",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.70.0"
+    "typescript-eslint": "8.70.0",
+    "vitest": "^5.0.0"
   }
 }

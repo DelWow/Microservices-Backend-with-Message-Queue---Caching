@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "DOM"],
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["vitest.config.ts"],
+  "references": [
+    { "path": "./packages/contracts" },
+    { "path": "./packages/platform" },
+    { "path": "./services/order-service" },
+    { "path": "./services/notification-service" }
+  ]
+}
