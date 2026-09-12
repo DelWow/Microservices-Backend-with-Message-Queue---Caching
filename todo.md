@@ -49,16 +49,16 @@
 
 ## 3. Define shared contracts and infrastructure helpers
 
-- [ ] Define the versioned `order.created` event schema.
-- [ ] Include event ID, event version, order ID, occurred-at timestamp, trace context, and payload in the event envelope.
-- [ ] Add runtime validation for event payloads.
-- [ ] Define shared order domain types and API response types.
-- [ ] Define a consistent structured error response shape.
+- [x] Define the versioned `order.created` event schema.
+- [x] Include event ID, event version, order ID, occurred-at timestamp, trace context, and payload in the event envelope.
+- [x] Add runtime validation for event payloads.
+- [x] Define shared order domain types and API response types.
+- [x] Define a consistent structured error response shape.
 - [ ] Implement shared environment-variable parsing and validation.
 - [ ] Implement shared structured logger configuration with request/correlation IDs.
 - [ ] Implement shared JWT signing/verification configuration.
 - [ ] Implement reusable bearer-token validation middleware.
-- [ ] Add unit tests for shared schema validation.
+- [x] Add unit tests for shared schema validation.
 - [ ] Add unit tests for environment validation.
 - [ ] Add unit tests for JWT middleware and failure cases.
 
