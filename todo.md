@@ -64,7 +64,8 @@
 
 ## 4. Design and initialize PostgreSQL
 
-- [ ] Document the proposed relational schema before implementing it.
+- [x] Document the proposed relational schema before implementing it.
+  - Proposed in `docs/adr/0002-postgresql-schema.md`; migrations require confirmation of the four listed choices.
 - [ ] Create the `orders` table migration.
 - [ ] Add appropriate primary key, timestamps, status constraint, and indexes.
 - [ ] Create the notification processed-events/idempotency table migration.
