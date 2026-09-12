@@ -56,11 +56,11 @@
 - [x] Define a consistent structured error response shape.
 - [x] Implement shared environment-variable parsing and validation.
 - [x] Implement shared structured logger configuration with request/correlation IDs.
-- [ ] Implement shared JWT signing/verification configuration.
-- [ ] Implement reusable bearer-token validation middleware.
+- [x] Implement shared JWT signing/verification configuration.
+- [x] Implement reusable bearer-token validation middleware.
 - [x] Add unit tests for shared schema validation.
 - [x] Add unit tests for environment validation.
-- [ ] Add unit tests for JWT middleware and failure cases.
+- [x] Add unit tests for JWT middleware and failure cases.
 
 ## 4. Design and initialize PostgreSQL
 
