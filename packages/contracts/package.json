@@ -18,5 +18,8 @@
     "build": "tsc --project tsconfig.json",
     "clean": "tsc --build tsconfig.json --clean",
     "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.2"
   }
 }

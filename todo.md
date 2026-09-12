@@ -49,27 +49,29 @@
 
 ## 3. Define shared contracts and infrastructure helpers
 
-- [ ] Define the versioned `order.created` event schema.
-- [ ] Include event ID, event version, order ID, occurred-at timestamp, trace context, and payload in the event envelope.
-- [ ] Add runtime validation for event payloads.
-- [ ] Define shared order domain types and API response types.
-- [ ] Define a consistent structured error response shape.
-- [ ] Implement shared environment-variable parsing and validation.
-- [ ] Implement shared structured logger configuration with request/correlation IDs.
-- [ ] Implement shared JWT signing/verification configuration.
-- [ ] Implement reusable bearer-token validation middleware.
-- [ ] Add unit tests for shared schema validation.
-- [ ] Add unit tests for environment validation.
-- [ ] Add unit tests for JWT middleware and failure cases.
+- [x] Define the versioned `order.created` event schema.
+- [x] Include event ID, event version, order ID, occurred-at timestamp, trace context, and payload in the event envelope.
+- [x] Add runtime validation for event payloads.
+- [x] Define shared order domain types and API response types.
+- [x] Define a consistent structured error response shape.
+- [x] Implement shared environment-variable parsing and validation.
+- [x] Implement shared structured logger configuration with request/correlation IDs.
+- [x] Implement shared JWT signing/verification configuration.
+- [x] Implement reusable bearer-token validation middleware.
+- [x] Add unit tests for shared schema validation.
+- [x] Add unit tests for environment validation.
+- [x] Add unit tests for JWT middleware and failure cases.
 
 ## 4. Design and initialize PostgreSQL
 
-- [ ] Document the proposed relational schema before implementing it.
-- [ ] Create the `orders` table migration.
-- [ ] Add appropriate primary key, timestamps, status constraint, and indexes.
-- [ ] Create the notification processed-events/idempotency table migration.
-- [ ] Add a unique event ID constraint for duplicate protection.
-- [ ] Create a notification-attempts or notification-results table if confirmed.
+- [x] Document the proposed relational schema before implementing it.
+  - Accepted in `docs/adr/0002-postgresql-schema.md`; the four listed choices were confirmed before migration implementation.
+- [x] Create the `orders` table migration.
+- [x] Add appropriate primary key, timestamps, status constraint, and indexes.
+- [x] Create the notification processed-events/idempotency table migration.
+- [x] Add a unique event ID constraint for duplicate protection.
+- [x] Create a notification-attempts or notification-results table if confirmed.
+  - Added a persisted `notifications` audit table; failed delivery attempts remain represented by RabbitMQ retry headers and structured logs.
 - [ ] Add a migration runner suitable for local development and CI.
 - [ ] Add seed data or a deterministic seed script for load testing.
 - [ ] Add database connection-pool helpers.
