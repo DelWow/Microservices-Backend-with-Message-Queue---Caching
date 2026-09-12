@@ -65,12 +65,13 @@
 ## 4. Design and initialize PostgreSQL
 
 - [x] Document the proposed relational schema before implementing it.
-  - Proposed in `docs/adr/0002-postgresql-schema.md`; migrations require confirmation of the four listed choices.
-- [ ] Create the `orders` table migration.
-- [ ] Add appropriate primary key, timestamps, status constraint, and indexes.
-- [ ] Create the notification processed-events/idempotency table migration.
-- [ ] Add a unique event ID constraint for duplicate protection.
-- [ ] Create a notification-attempts or notification-results table if confirmed.
+  - Accepted in `docs/adr/0002-postgresql-schema.md`; the four listed choices were confirmed before migration implementation.
+- [x] Create the `orders` table migration.
+- [x] Add appropriate primary key, timestamps, status constraint, and indexes.
+- [x] Create the notification processed-events/idempotency table migration.
+- [x] Add a unique event ID constraint for duplicate protection.
+- [x] Create a notification-attempts or notification-results table if confirmed.
+  - Added a persisted `notifications` audit table; failed delivery attempts remain represented by RabbitMQ retry headers and structured logs.
 - [ ] Add a migration runner suitable for local development and CI.
 - [ ] Add seed data or a deterministic seed script for load testing.
 - [ ] Add database connection-pool helpers.

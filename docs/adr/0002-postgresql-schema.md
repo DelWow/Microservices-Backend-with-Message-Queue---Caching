@@ -1,8 +1,8 @@
 # ADR 0002: PostgreSQL Data Model and Transaction Boundaries
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-11
-- Decision required before migrations: Yes
+- Decision confirmed: 2026-09-11
 
 ## Context
 
@@ -214,9 +214,9 @@ Each service owns a numbered migration directory and migration history table in 
 - Persisted mock notifications make idempotency observable through an API and integration tests.
 - `BIGINT` values must be range-checked when converted to JavaScript numbers.
 
-## Confirmation requested
+## Confirmation
 
-Before migrations are written, confirm or revise these choices:
+The instruction to continue Step 4 confirmed these choices before migrations were written:
 
 1. Separate `orders_db` and `notifications_db` databases in one local PostgreSQL container.
 2. Transactional outbox instead of direct post-commit RabbitMQ publishing.
