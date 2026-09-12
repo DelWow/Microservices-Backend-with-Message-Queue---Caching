@@ -36,8 +36,8 @@
 - [x] Create the root `package.json` with npm workspaces.
 - [x] Add root scripts for build, lint, type-check, test, and coverage.
 - [x] Create a strict shared TypeScript configuration.
-- [ ] Configure ESLint for TypeScript.
-- [ ] Configure Prettier and formatting exclusions.
+- [x] Configure ESLint for TypeScript.
+- [x] Configure Prettier and formatting exclusions.
 - [ ] Configure the test runner and coverage thresholds.
 - [ ] Create workspace directories for Order Service, Notification Service, and shared packages.
 - [x] Add `.gitignore` entries for dependencies, builds, coverage, logs, secrets, and load-test output.
