@@ -1,0 +1,28 @@
+{
+  "name": "microservices-backend-message-queue-caching",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A production-minded TypeScript microservices demo with PostgreSQL, Redis, RabbitMQ, and OpenTelemetry.",
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
+  },
+  "packageManager": "npm@11.17.0",
+  "workspaces": [
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}
