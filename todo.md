@@ -54,12 +54,12 @@
 - [x] Add runtime validation for event payloads.
 - [x] Define shared order domain types and API response types.
 - [x] Define a consistent structured error response shape.
-- [ ] Implement shared environment-variable parsing and validation.
-- [ ] Implement shared structured logger configuration with request/correlation IDs.
+- [x] Implement shared environment-variable parsing and validation.
+- [x] Implement shared structured logger configuration with request/correlation IDs.
 - [ ] Implement shared JWT signing/verification configuration.
 - [ ] Implement reusable bearer-token validation middleware.
 - [x] Add unit tests for shared schema validation.
-- [ ] Add unit tests for environment validation.
+- [x] Add unit tests for environment validation.
 - [ ] Add unit tests for JWT middleware and failure cases.
 
 ## 4. Design and initialize PostgreSQL
