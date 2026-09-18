@@ -22,6 +22,15 @@ function buildApplication(
     },
     jwt: {
       signAccessToken: overrides.signAccessToken ?? vi.fn().mockResolvedValue('signed-token'),
+      verifyAccessToken: vi.fn().mockResolvedValue({
+        subject: 'demo:demo',
+        username: 'demo',
+        roles: ['customer'],
+      }),
+    },
+    orders: {
+      createOrder: vi.fn(),
+      findOrder: vi.fn(),
     },
     ...(overrides.logger === undefined ? {} : { logger: overrides.logger }),
   });
