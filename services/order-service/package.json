@@ -12,6 +12,7 @@
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
+    "fastify": "^5.12.4",
     "mongodb": "^7.6.0"
   }
 }

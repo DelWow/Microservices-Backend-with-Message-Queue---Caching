@@ -81,17 +81,17 @@
 
 ## 5. Build the Order Service core
 
-- [ ] Create the Order Service application factory separately from process startup.
-- [ ] Add request IDs and structured request logging.
-- [ ] Implement the protected mock login endpoint and deterministic demo credentials.
+- [x] Create the Order Service application factory separately from process startup.
+- [x] Add request IDs and structured request logging.
+- [x] Implement the protected mock login endpoint and deterministic demo credentials.
 - [ ] Implement authenticated `POST /orders` request validation.
 - [x] Implement the MongoDB order repository create operation with an atomic embedded outbox.
 - [ ] Implement authenticated `GET /orders/:id` request validation.
 - [x] Implement the MongoDB order repository read operation.
-- [ ] Return consistent 400, 401, 404, and 500 responses.
+- [x] Return consistent 400, 401, 404, and 500 responses.
 - [ ] Add unit tests for order request validation.
 - [ ] Add unit tests for order service business logic.
-- [ ] Add API tests for login success and failure.
+- [x] Add API tests for login success and failure.
 - [ ] Add API tests for create-order authentication and validation.
 - [ ] Add API tests for fetch-order authentication and not-found behavior.
 - [ ] Run and report the Order Service test count.
