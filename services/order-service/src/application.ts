@@ -9,6 +9,14 @@ import fastify, {
 } from 'fastify';
 
 import type { OrderManagementService } from './order-service.js';
+import {
+  CreateOrderBodySchema,
+  LoginRequestSchema,
+  OrderParametersSchema,
+  type CreateOrderBody,
+  type LoginRequest,
+  type OrderParameters,
+} from './request-schemas.js';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -47,24 +55,6 @@ export interface CreateOrderApplicationOptions {
   readonly orders: Pick<OrderManagementService, 'createOrder' | 'findOrder'>;
 }
 
-interface LoginBody {
-  readonly username: string;
-  readonly password: string;
-}
-
-interface CreateOrderBody {
-  readonly currency: string;
-  readonly items: readonly {
-    readonly productId: string;
-    readonly quantity: number;
-    readonly unitPriceCents: number;
-  }[];
-}
-
-interface OrderParameters {
-  readonly orderId: string;
-}
-
 type ErrorCode =
   | 'VALIDATION_ERROR'
   | 'AUTHENTICATION_REQUIRED'
@@ -83,55 +73,11 @@ class ApplicationError extends Error {
   }
 }
 
-const LOGIN_BODY_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['username', 'password'],
-  properties: {
-    username: { type: 'string', minLength: 1, maxLength: 128 },
-    password: { type: 'string', minLength: 1, maxLength: 256 },
-  },
-} as const;
-
-const ORDER_ITEM_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['productId', 'quantity', 'unitPriceCents'],
-  properties: {
-    productId: { type: 'string', minLength: 1, maxLength: 128 },
-    quantity: { type: 'integer', minimum: 1, maximum: 1_000 },
-    unitPriceCents: { type: 'integer', minimum: 0, maximum: 100_000_000 },
-  },
-} as const;
-
-const CREATE_ORDER_BODY_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['currency', 'items'],
-  properties: {
-    currency: { type: 'string', pattern: '^[A-Z]{3}$' },
-    items: { type: 'array', minItems: 1, maxItems: 100, items: ORDER_ITEM_SCHEMA },
-  },
-} as const;
-
-const ORDER_PARAMETERS_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['orderId'],
-  properties: {
-    orderId: {
-      type: 'string',
-      pattern:
-        '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
-    },
-  },
-} as const;
-
 function credentialDigest(value: string): Buffer {
   return createHash('sha256').update(value, 'utf8').digest();
 }
 
-function credentialsMatch(actual: LoginBody, expected: DemoCredentials): boolean {
+function credentialsMatch(actual: LoginRequest, expected: DemoCredentials): boolean {
   const usernameMatches = timingSafeEqual(
     credentialDigest(actual.username),
     credentialDigest(expected.username),
@@ -176,6 +122,19 @@ function traceContext(): Readonly<Record<string, string>> {
   return {
     traceparent: `00-${randomBytes(16).toString('hex')}-${randomBytes(8).toString('hex')}-01`,
   };
+}
+
+function parseRequest<Output>(
+  schema: { safeParse(input: unknown): { success: true; data: Output } | { success: false } },
+  input: unknown,
+): Output {
+  const result = schema.safeParse(input);
+
+  if (!result.success) {
+    throw new ApplicationError(400, 'VALIDATION_ERROR', 'The request is invalid');
+  }
+
+  return result.data;
 }
 
 function errorResponse(code: ErrorCode, message: string, requestId: string): object {
@@ -244,46 +203,42 @@ export function createOrderApplication(options: CreateOrderApplicationOptions): 
     }
   };
 
-  application.post<{ Body: LoginBody }>(
-    '/auth/login',
-    { schema: { body: LOGIN_BODY_SCHEMA } },
-    async (request) => {
-      if (!credentialsMatch(request.body, options.demoCredentials)) {
-        throw new ApplicationError(
-          401,
-          'AUTHENTICATION_INVALID',
-          'The username or password is invalid',
-        );
-      }
+  application.post<{ Body: unknown }>('/auth/login', async (request) => {
+    const body = parseRequest(LoginRequestSchema, request.body);
 
-      const accessToken = await options.jwt.signAccessToken({
-        subject: `demo:${options.demoCredentials.username}`,
-        username: options.demoCredentials.username,
-        roles: ['customer'],
-      });
+    if (!credentialsMatch(body, options.demoCredentials)) {
+      throw new ApplicationError(
+        401,
+        'AUTHENTICATION_INVALID',
+        'The username or password is invalid',
+      );
+    }
 
-      return {
-        data: {
-          accessToken,
-          expiresIn: options.accessTokenTtlSeconds,
-          tokenType: 'Bearer',
-        },
-      };
-    },
-  );
+    const accessToken = await options.jwt.signAccessToken({
+      subject: `demo:${options.demoCredentials.username}`,
+      username: options.demoCredentials.username,
+      roles: ['customer'],
+    });
 
-  application.post<{ Body: CreateOrderBody }>(
+    return {
+      data: {
+        accessToken,
+        expiresIn: options.accessTokenTtlSeconds,
+        tokenType: 'Bearer',
+      },
+    };
+  });
+
+  application.post<{ Body: unknown }>(
     '/orders',
-    {
-      preHandler: authenticate,
-      schema: { body: CREATE_ORDER_BODY_SCHEMA },
-    },
+    { preHandler: authenticate },
     async (request, reply) => {
+      const body: CreateOrderBody = parseRequest(CreateOrderBodySchema, request.body);
       const claims = authenticatedClaims(request);
       const order = await options.orders.createOrder({
         customerId: claims.subject,
-        currency: request.body.currency,
-        items: request.body.items,
+        currency: body.currency,
+        items: body.items,
         correlationId: request.id,
         traceContext: traceContext(),
       });
@@ -292,15 +247,13 @@ export function createOrderApplication(options: CreateOrderApplicationOptions): 
     },
   );
 
-  application.get<{ Params: OrderParameters }>(
+  application.get<{ Params: unknown }>(
     '/orders/:orderId',
-    {
-      preHandler: authenticate,
-      schema: { params: ORDER_PARAMETERS_SCHEMA },
-    },
+    { preHandler: authenticate },
     async (request) => {
+      const parameters: OrderParameters = parseRequest(OrderParametersSchema, request.params);
       const claims = authenticatedClaims(request);
-      const order = await options.orders.findOrder(request.params.orderId, claims.subject);
+      const order = await options.orders.findOrder(parameters.orderId, claims.subject);
 
       if (order === null) {
         throw new ApplicationError(404, 'NOT_FOUND', 'The requested order was not found');

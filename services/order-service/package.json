@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "fastify": "^5.12.4",
-    "mongodb": "^7.6.0"
+    "mongodb": "^7.6.0",
+    "zod": "^4.6.2"
   }
 }
