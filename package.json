@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A production-minded TypeScript microservices demo with PostgreSQL, Redis, RabbitMQ, and OpenTelemetry.",
+  "description": "A production-minded TypeScript microservices demo with MongoDB, Redis, RabbitMQ, and OpenTelemetry.",
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=11.0.0"
@@ -16,6 +16,8 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
+    "db:bootstrap": "npm run db:bootstrap --workspaces --if-present",
+    "db:seed": "node --import tsx scripts/seed-mongodb.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
@@ -31,9 +33,14 @@
     "@types/node": "^22.20.2",
     "@vitest/coverage-v8": "^5.0.0",
     "eslint": "10.10.0",
+    "mongodb-memory-server": "^11.2.0",
     "prettier": "3.9.6",
+    "tsx": "^4.23.13",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.0",
     "vitest": "^5.0.0"
+  },
+  "dependencies": {
+    "mongodb": "^7.6.0"
   }
 }

@@ -1,6 +1,6 @@
 # ADR 0002: PostgreSQL Data Model and Transaction Boundaries
 
-- Status: Accepted
+- Status: Superseded by ADR 0003
 - Date: 2026-09-11
 - Decision confirmed: 2026-09-11
 

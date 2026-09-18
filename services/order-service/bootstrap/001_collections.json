@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "collections": [
+    {
+      "name": "orders",
+      "validator": {
+        "$jsonSchema": {
+          "bsonType": "object",
+          "required": [
+            "_id",
+            "customerId",
+            "status",
+            "currency",
+            "items",
+            "totalCents",
+            "createdAt",
+            "updatedAt"
+          ],
+          "properties": {
+            "_id": { "bsonType": "string" },
+            "customerId": { "bsonType": "string", "minLength": 1 },
+            "status": { "enum": ["pending", "confirmed", "cancelled"] },
+            "currency": { "bsonType": "string", "pattern": "^[A-Z]{3}$" },
+            "items": {
+              "bsonType": "array",
+              "minItems": 1,
+              "items": {
+                "bsonType": "object",
+                "required": ["productId", "quantity", "unitPriceCents"],
+                "properties": {
+                  "productId": { "bsonType": "string", "minLength": 1 },
+                  "quantity": { "bsonType": ["int", "long", "double"], "minimum": 1 },
+                  "unitPriceCents": {
+                    "bsonType": ["int", "long", "double"],
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "totalCents": { "bsonType": ["int", "long", "double"], "minimum": 0 },
+            "createdAt": { "bsonType": "date" },
+            "updatedAt": { "bsonType": "date" },
+            "outbox": {
+              "bsonType": ["object", "null"],
+              "properties": {
+                "eventId": { "bsonType": "string" },
+                "eventType": { "bsonType": "string" },
+                "eventVersion": { "bsonType": ["int", "long", "double"] },
+                "payload": { "bsonType": "object" },
+                "traceContext": { "bsonType": "object" },
+                "correlationId": { "bsonType": "string" },
+                "occurredAt": { "bsonType": "date" },
+                "publishedAt": { "bsonType": ["date", "null"] },
+                "publishAttempts": { "bsonType": ["int", "long", "double"] },
+                "nextAttemptAt": { "bsonType": "date" },
+                "lastError": { "bsonType": ["string", "null"] }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "indexes": [
+        {
+          "name": "orders_customer_created_at",
+          "key": { "customerId": 1, "createdAt": -1 }
+        },
+        {
+          "name": "orders_status_created_at",
+          "key": { "status": 1, "createdAt": 1 }
+        },
+        {
+          "name": "orders_outbox_pending",
+          "key": { "outbox.nextAttemptAt": 1, "outbox.occurredAt": 1 },
+          "partialFilterExpression": { "outbox.eventId": { "$exists": true } }
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Microservices Backend — Implementation TODO
 
-> Status: core architecture confirmed. Step 2 implementation may begin on the next instruction.
+> Status: Steps 1–3 and the MongoDB persistence work in Step 4 are complete; live Compose verification remains pending because no Docker daemon is available.
 >
 > Working rule: keep all changes unstaged and uncommitted; do not run `git add`, `git commit`, or `git push` unless explicitly requested.
 
@@ -12,8 +12,8 @@
   - Decision: RabbitMQ, because durable queues, acknowledgements, bounded retry queues, publisher confirms, and dead-letter routing directly support the reliability requirements.
 - [x] Confirm the HTTP framework (recommended: Fastify; alternative: Express).
   - Decision: Fastify, because its schema-first validation, structured Pino logging, lifecycle hooks, and low overhead fit the API and load-testing goals.
-- [x] Confirm the database access layer (recommended: `pg` with explicit SQL; alternative: Prisma).
-  - Decision: use `pg` with explicit, versioned SQL migrations to keep database behavior visible and demonstrate PostgreSQL skills without ORM abstraction.
+- [x] Confirm the database access layer.
+  - Decision superseded on 2026-09-18: use the official `mongodb` driver with versioned collection/index bootstrap files and no ODM.
 - [x] Confirm the monorepo/package manager approach (recommended: npm workspaces).
   - Decision: use npm workspaces with independently buildable/deployable service packages and focused shared packages.
 - [x] Confirm the JWT ownership model (recommended: mock login in Order Service with shared verification middleware in both services).
@@ -62,21 +62,22 @@
 - [x] Add unit tests for environment validation.
 - [x] Add unit tests for JWT middleware and failure cases.
 
-## 4. Design and initialize PostgreSQL
+## 4. Design and initialize MongoDB
 
-- [x] Document the proposed relational schema before implementing it.
-  - Accepted in `docs/adr/0002-postgresql-schema.md`; the four listed choices were confirmed before migration implementation.
-- [x] Create the `orders` table migration.
-- [x] Add appropriate primary key, timestamps, status constraint, and indexes.
-- [x] Create the notification processed-events/idempotency table migration.
-- [x] Add a unique event ID constraint for duplicate protection.
-- [x] Create a notification-attempts or notification-results table if confirmed.
-  - Added a persisted `notifications` audit table; failed delivery attempts remain represented by RabbitMQ retry headers and structured logs.
-- [ ] Add a migration runner suitable for local development and CI.
-- [ ] Add seed data or a deterministic seed script for load testing.
-- [ ] Add database connection-pool helpers.
-- [ ] Add tests for migrations against a disposable PostgreSQL instance.
-- [ ] Verify migrations are repeatable from a clean database.
+- [x] Supersede the PostgreSQL schema ADR with the MongoDB document model and atomicity decision.
+- [x] Use the official MongoDB driver with explicit connect, readiness, transaction, and shutdown helpers.
+- [x] Embed order items and the pending outbox event in each order document.
+- [x] Create a versioned Order Service bootstrap specification with validation and named indexes.
+- [x] Create versioned Notification Service bootstrap specifications for `processed_events` and `notifications`.
+- [x] Add a unique `processed_events.eventId` index for idempotency.
+- [x] Detect duplicate events by catching E11000 on insert without a pre-read.
+- [x] Use a replica-set transaction for the separate idempotency marker and notification audit record.
+- [x] Add an idempotent checksum-aware bootstrap runner for local development and CI.
+- [x] Add deterministic MongoDB seed data for future cache load tests.
+- [x] Add real disposable replica-set integration tests for bootstrap, indexes, E11000 handling, and rollback.
+- [x] Add single-node replica-set Compose infrastructure with persistent storage and health checks.
+- [x] Replace PostgreSQL tracing support with MongoDB OpenTelemetry instrumentation.
+- [ ] Verify Compose bootstrap and seed commands against a running Docker daemon.
 
 ## 5. Build the Order Service core
 
@@ -84,9 +85,9 @@
 - [ ] Add request IDs and structured request logging.
 - [ ] Implement the protected mock login endpoint and deterministic demo credentials.
 - [ ] Implement authenticated `POST /orders` request validation.
-- [ ] Implement the PostgreSQL order repository create operation.
+- [ ] Implement the MongoDB order repository create operation.
 - [ ] Implement authenticated `GET /orders/:id` request validation.
-- [ ] Implement the PostgreSQL order repository read operation.
+- [ ] Implement the MongoDB order repository read operation.
 - [ ] Return consistent 400, 401, 404, and 500 responses.
 - [ ] Add unit tests for order request validation.
 - [ ] Add unit tests for order service business logic.
@@ -104,7 +105,7 @@
 - [ ] Implement cache-aside reads for `GET /orders/:id`.
 - [ ] Populate or invalidate the cache after successful order creation.
 - [ ] Add a configuration switch to disable caching for benchmark parity.
-- [ ] Define safe behavior when Redis is unavailable (fall back to PostgreSQL).
+- [ ] Define safe behavior when Redis is unavailable (fall back to MongoDB).
 - [ ] Add cache hit/miss/bypass metadata to structured logs.
 - [ ] Add unit tests for cache hit, miss, expiry assumptions, and bypass paths.
 - [ ] Add integration tests for cached reads and Redis failure fallback.
@@ -175,7 +176,7 @@
 - [ ] Stop accepting new HTTP requests on SIGTERM/SIGINT.
 - [ ] Stop or cancel message consumption before closing the broker channel.
 - [ ] Allow in-flight message handling to finish within a configured deadline.
-- [ ] Close PostgreSQL, Redis, RabbitMQ, and telemetry resources in safe order.
+- [ ] Close MongoDB, Redis, RabbitMQ, and telemetry resources in safe order.
 - [ ] Force exit with an error after the shutdown deadline if cleanup hangs.
 - [ ] Add tests for liveness and readiness state changes.
 - [ ] Add tests for shutdown ordering.
@@ -186,7 +187,7 @@
 
 - [ ] Add OpenTelemetry SDK initialization before application imports.
 - [ ] Configure service names and resource attributes for both services.
-- [ ] Instrument inbound/outbound HTTP, PostgreSQL, Redis, and RabbitMQ operations.
+- [ ] Instrument inbound/outbound HTTP, MongoDB, Redis, and RabbitMQ operations.
 - [ ] Export OTLP traces to the configured collector/Jaeger endpoint.
 - [ ] Create spans for order creation, event publishing, consumption, and notification work.
 - [ ] Extract the producer trace context when consuming a message.
@@ -201,7 +202,7 @@
 
 - [ ] Write production-like multi-stage Dockerfiles for both services.
 - [ ] Add `.dockerignore` files.
-- [ ] Define PostgreSQL with persistent storage and a health check.
+- [x] Define MongoDB with persistent storage, replica-set initialization, and a health check.
 - [ ] Define Redis with persistent storage and a health check.
 - [ ] Define RabbitMQ with the management UI, persistent storage, and a health check.
 - [ ] Define Jaeger with OTLP ingestion and its UI port.
@@ -209,7 +210,7 @@
 - [ ] Define Notification Service with dependency conditions and a real HTTP health check.
 - [ ] Pass configuration via Compose environment variables without embedding real secrets.
 - [ ] Add named networks and volumes.
-- [ ] Confirm `docker compose config` is valid.
+- [x] Confirm `docker compose config` is valid.
 - [ ] Confirm a clean `docker compose up --build` reaches healthy state.
 - [ ] Confirm `docker compose ps` reflects service readiness accurately.
 - [ ] Confirm data survives ordinary container recreation.
@@ -220,7 +221,7 @@
 - [ ] Add authentication edge-case tests.
 - [ ] Add cache behavior and fallback tests.
 - [ ] Add messaging serialization and validation tests.
-- [ ] Add idempotency and duplicate-delivery tests.
+- [x] Add idempotency and duplicate-delivery tests for MongoDB persistence.
 - [ ] Add retry, DLQ, and poison-message tests.
 - [ ] Add circuit-breaker transition tests.
 - [ ] Add health/readiness tests.
@@ -228,24 +229,25 @@
 - [ ] Add trace-propagation tests.
 - [ ] Add cross-service integration tests using real infrastructure.
 - [ ] Add at least one end-to-end order-to-notification test.
-- [ ] Reach at least 40 meaningful passing tests without padding with trivial cases.
-- [ ] Run the entire test suite from a clean state.
-- [ ] Record the exact passing test count and duration.
-- [ ] Review coverage output and close material gaps in critical paths.
+- [x] Reach at least 40 meaningful passing tests without padding with trivial cases.
+- [x] Run the entire test suite from a clean state.
+- [x] Record the exact passing test count and duration for the MongoDB migration milestone.
+- [x] Review coverage output and close material gaps in critical persistence paths.
 
 ## 14. Add CI workflow
 
-- [ ] Create a GitHub Actions workflow triggered on pushes and pull requests.
-- [ ] Pin the Node.js major version used by the project.
-- [ ] Cache npm dependencies safely.
-- [ ] Start required PostgreSQL, Redis, and RabbitMQ service containers.
-- [ ] Wait for service-container readiness before integration tests.
-- [ ] Run deterministic dependency installation.
-- [ ] Run formatting check.
-- [ ] Run linting.
-- [ ] Run TypeScript type-checking.
-- [ ] Run unit and integration tests with coverage.
-- [ ] Run application builds.
+- [x] Create a GitHub Actions workflow triggered on pushes and pull requests.
+- [x] Pin the Node.js major version used by the project.
+- [x] Cache npm dependencies and disposable MongoDB binaries safely.
+- [ ] Start required MongoDB, Redis, and RabbitMQ service containers.
+- [x] Start the MongoDB service container; add Redis and RabbitMQ when their runtime wiring exists.
+- [x] Wait for the MongoDB service-container readiness before integration tests.
+- [x] Run deterministic dependency installation.
+- [x] Run formatting check.
+- [x] Run linting.
+- [x] Run TypeScript type-checking.
+- [x] Run unit and integration tests with coverage.
+- [x] Run application builds.
 - [ ] Upload coverage/test artifacts where useful.
 - [ ] Validate workflow YAML locally where tooling permits.
 
@@ -280,13 +282,13 @@
 
 ## 17. Write project documentation
 
-- [ ] Write a concise project overview and feature list.
-- [ ] Add a Mermaid architecture diagram.
+- [x] Write a concise project overview and current implementation status.
+- [x] Add a Mermaid architecture diagram.
 - [ ] Document the HTTP request, database, cache, and event flows.
-- [ ] Document prerequisites and exact local startup commands.
-- [ ] Document environment variables and safe demo defaults.
+- [x] Document prerequisites and exact local MongoDB startup commands.
+- [x] Document MongoDB environment variables and safe local defaults.
 - [ ] Document mock login credentials and API examples.
-- [ ] Document migrations and seed commands.
+- [x] Document MongoDB bootstrap and seed commands.
 - [ ] Document health/readiness URLs and expected responses.
 - [ ] Document RabbitMQ management and Jaeger UI URLs.
 - [ ] Document the circuit-breaker trip/recovery demo.
@@ -295,7 +297,7 @@
 - [ ] Embed or link the verified end-to-end trace example.
 - [ ] Add the measured cache-disabled versus cache-enabled results table.
 - [ ] Explain benchmark methodology and limitations honestly.
-- [ ] Add the exact automated test count and CI commands.
+- [x] Add the exact automated test count and CI commands for the MongoDB migration milestone.
 - [ ] Add troubleshooting guidance for common Docker/port issues.
 - [ ] Add 5–6 resume-ready bullets grounded in verified project metrics.
 

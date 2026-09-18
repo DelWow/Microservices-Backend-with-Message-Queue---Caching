@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/cache@v4
+        with:
+          path: .cache/mongodb-binaries
+          key: mongodb-binary-${{ runner.os }}-${{ runner.arch }}-v1
+
+      - run: npm ci
+
+      - name: Wait for MongoDB service readiness
+        run: >-
+          node --input-type=module -e
+          "import { MongoClient } from 'mongodb';
+          const client = new MongoClient('mongodb://127.0.0.1:27017', { serverSelectionTimeoutMS: 30000 });
+          await client.connect();
+          await client.db('admin').command({ ping: 1 });
+          await client.close();"
+
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run test:coverage
