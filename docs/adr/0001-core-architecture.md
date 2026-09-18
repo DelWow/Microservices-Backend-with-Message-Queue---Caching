@@ -5,7 +5,7 @@
 
 ## Context
 
-This project is a resume-oriented TypeScript backend that must demonstrate independent services, asynchronous messaging, PostgreSQL persistence, Redis caching, JWT authentication, resilience, distributed tracing, container orchestration, and measurable load-test results. The design favors explicit behavior, reproducible demonstrations, and operational clarity over feature breadth.
+This project is a resume-oriented TypeScript backend that must demonstrate independent services, asynchronous messaging, MongoDB persistence, Redis caching, JWT authentication, resilience, distributed tracing, container orchestration, and measurable load-test results. The design favors explicit behavior, reproducible demonstrations, and operational clarity over feature breadth.
 
 ## Decisions
 
@@ -15,13 +15,13 @@ Use an npm-workspaces monorepo containing independently buildable and deployable
 
 Use Fastify for HTTP APIs. Its JSON-schema-based validation, lifecycle hooks, Pino logging integration, and low framework overhead are well suited to the validation, observability, graceful-shutdown, and benchmarking requirements.
 
-### Persistence
+### Persistence (superseded by ADR 0003)
 
-Use the `pg` driver and explicit, versioned SQL migrations rather than an ORM. This keeps schema constraints, transactions, indexes, query behavior, and migration mechanics visible. PostgreSQL is the source of truth.
+Use the official MongoDB driver and explicit, versioned collection bootstrap specifications rather than an ODM. This keeps document validation, indexes, transactions, and query behavior visible. MongoDB is the source of truth. ADR 0003 records the current document model and supersedes the original PostgreSQL choice.
 
-Use Redis as a cache-aside layer for order reads. Cache entries will be configurable so identical load-test scenarios can run with caching enabled and disabled. Redis failure will degrade reads to PostgreSQL rather than make the Order Service unavailable.
+Use Redis as a cache-aside layer for order reads. Cache entries will be configurable so identical load-test scenarios can run with caching enabled and disabled. Redis failure will degrade reads to MongoDB rather than make the Order Service unavailable.
 
-The detailed table design remains a Step 4 decision. At minimum, the schema will support orders and durable notification idempotency records. The write/event consistency strategy will be decided explicitly when the schema and RabbitMQ publishing flow are designed; an outbox is preferred if it can remain understandable within the project's scope.
+The detailed document model and atomicity decision are defined in ADR 0003. Orders embed line items and their outbox record; notification idempotency and audit documents use a replica-set transaction.
 
 ### Messaging
 
@@ -53,7 +53,7 @@ Horizontal scaling behind a load balancer is excluded from the initial build. It
 
 ## Consequences
 
-- The project shows SQL, messaging topology, failure handling, and cache behavior directly rather than hiding them behind broad abstractions.
+- The project shows document modeling, indexes, messaging topology, failure handling, and cache behavior directly rather than hiding them behind broad abstractions.
 - Shared contracts reduce drift, while independent service entry points retain deployability boundaries.
 - RabbitMQ adds operational complexity but enables meaningful acknowledgement, retry, and DLQ demonstrations that Redis Pub/Sub does not provide.
 - A separate synchronous probe demonstrates circuit-breaking without compromising the asynchronous order workflow.
@@ -64,8 +64,7 @@ Horizontal scaling behind a load balancer is excluded from the initial build. It
 
 The following decisions belong to later TODO steps and will be finalized immediately before their implementation:
 
-- Exact PostgreSQL tables, columns, indexes, and transaction boundaries.
-- Transactional outbox versus a documented post-commit publish consistency limitation.
+- Exact MongoDB repository query shapes and projections.
 - RabbitMQ exchange, queue, retry-delay, retry-count, and DLQ names.
 - Cache TTL and benchmark workload parameters.
 - Concrete circuit-breaker thresholds and dependency-probe endpoint shape.

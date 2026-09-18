@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "collections": [
+    {
+      "name": "processed_events",
+      "validator": {
+        "$jsonSchema": {
+          "bsonType": "object",
+          "required": ["_id", "eventId", "eventType", "eventVersion", "orderId", "processedAt"],
+          "properties": {
+            "_id": { "bsonType": "string" },
+            "eventId": { "bsonType": "string" },
+            "eventType": { "bsonType": "string" },
+            "eventVersion": { "bsonType": ["int", "long", "double"] },
+            "orderId": { "bsonType": "string" },
+            "processedAt": { "bsonType": "date" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "indexes": [
+        {
+          "name": "processed_events_event_id_unique",
+          "key": { "eventId": 1 },
+          "unique": true
+        },
+        {
+          "name": "processed_events_order_processed_at",
+          "key": { "orderId": 1, "processedAt": -1 }
+        }
+      ]
+    },
+    {
+      "name": "notifications",
+      "validator": {
+        "$jsonSchema": {
+          "bsonType": "object",
+          "required": [
+            "_id",
+            "eventId",
+            "orderId",
+            "customerId",
+            "channel",
+            "status",
+            "message",
+            "createdAt"
+          ],
+          "properties": {
+            "_id": { "bsonType": "string" },
+            "eventId": { "bsonType": "string" },
+            "orderId": { "bsonType": "string" },
+            "customerId": { "bsonType": "string" },
+            "channel": { "enum": ["log"] },
+            "status": { "enum": ["sent", "failed"] },
+            "message": { "bsonType": "string", "minLength": 1 },
+            "createdAt": { "bsonType": "date" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "indexes": [
+        {
+          "name": "notifications_event_id_unique",
+          "key": { "eventId": 1 },
+          "unique": true
+        },
+        {
+          "name": "notifications_order_created_at",
+          "key": { "orderId": 1, "createdAt": -1 }
+        },
+        {
+          "name": "notifications_customer_created_at",
+          "key": { "customerId": 1, "createdAt": -1 }
+        }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 node_modules/
 
 # Compiled output and caches
+.cache/
 dist/
 coverage/
 *.tsbuildinfo

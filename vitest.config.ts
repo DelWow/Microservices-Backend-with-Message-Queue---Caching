@@ -4,7 +4,14 @@ export default defineConfig({
   test: {
     clearMocks: true,
     coverage: {
-      exclude: ['**/*.d.ts', '**/dist/**', '**/node_modules/**', '**/test/**', '**/tests/**'],
+      exclude: [
+        '**/*.d.ts',
+        '**/dist/**',
+        '**/bootstrap-cli.ts',
+        '**/node_modules/**',
+        '**/test/**',
+        '**/tests/**',
+      ],
       include: ['packages/*/src/**/*.ts', 'services/*/src/**/*.ts'],
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
