@@ -10,5 +10,8 @@
     "db:bootstrap": "node --import tsx ../../packages/platform/src/bootstrap-cli.ts --database-uri-env ORDER_MONGODB_URI --database-name-env ORDER_MONGODB_DATABASE --bootstrap bootstrap --application-name order-service-bootstrap",
     "start": "node dist/index.js",
     "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "mongodb": "^7.6.0"
   }
 }

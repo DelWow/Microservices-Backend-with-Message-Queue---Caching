@@ -14,6 +14,11 @@ import {
   withMongoTransaction,
 } from '../packages/platform/src/index.js';
 import { MongoNotificationRepository } from '../services/notification-service/src/index.js';
+import {
+  MongoOrderRepository,
+  type RepositoryOrder,
+  type RepositoryOrderCreatedEvent,
+} from '../services/order-service/src/index.js';
 
 process.env.MONGOMS_DOWNLOAD_DIR ??= resolve('.cache/mongodb-binaries');
 
@@ -198,5 +203,71 @@ describe('notification idempotency transaction', () => {
     } catch (error: unknown) {
       expect(isMongoDuplicateKeyError(error)).toBe(true);
     }
+  });
+});
+
+describe('MongoDB order repository', () => {
+  const order: RepositoryOrder = {
+    id: 'a2dcadf0-888e-4d8c-bbfa-b01e95bc38b6',
+    customerId: 'customer-1',
+    status: 'pending',
+    currency: 'CAD',
+    items: [{ productId: 'product-1', quantity: 2, unitPriceCents: 1_250 }],
+    totalCents: 2_500,
+    createdAt: '2026-09-18T12:00:00.000Z',
+    updatedAt: '2026-09-18T12:00:00.000Z',
+  };
+  const event: RepositoryOrderCreatedEvent = {
+    eventId: '066037b6-2f0d-4b67-b0f0-11763e346fec',
+    eventType: 'order.created',
+    eventVersion: 1,
+    occurredAt: '2026-09-18T12:00:00.000Z',
+    correlationId: 'request-1',
+    traceContext: {
+      traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+    },
+    payload: { order },
+  };
+
+  it('creates an order with its outbox atomically and reads the public order shape', async () => {
+    const database = connectedClient().db('order_repository_create_test');
+    await applyBootstrap(database, ORDER_BOOTSTRAP);
+    const repository = new MongoOrderRepository(database);
+
+    await expect(repository.create(order, event)).resolves.toEqual(order);
+    await expect(repository.findById(order.id)).resolves.toEqual(order);
+
+    const stored = await database.collection<{ _id: string }>('orders').findOne({ _id: order.id });
+    expect(stored).toMatchObject({
+      _id: order.id,
+      createdAt: new Date(order.createdAt),
+      outbox: {
+        eventId: event.eventId,
+        publishedAt: null,
+        publishAttempts: 0,
+        nextAttemptAt: new Date(event.occurredAt),
+      },
+    });
+  });
+
+  it('returns null when an order does not exist', async () => {
+    const database = connectedClient().db('order_repository_missing_test');
+    await applyBootstrap(database, ORDER_BOOTSTRAP);
+    const repository = new MongoOrderRepository(database);
+
+    await expect(repository.findById('missing-order')).resolves.toBeNull();
+  });
+
+  it('leaves the original order intact when a duplicate ID is inserted', async () => {
+    const database = connectedClient().db('order_repository_duplicate_test');
+    await applyBootstrap(database, ORDER_BOOTSTRAP);
+    const repository = new MongoOrderRepository(database);
+    await repository.create(order, event);
+
+    await expect(repository.create(order, { ...event, eventId: 'event-2' })).rejects.toMatchObject({
+      code: 11_000,
+    });
+    await expect(database.collection('orders').countDocuments()).resolves.toBe(1);
+    await expect(repository.findById(order.id)).resolves.toEqual(order);
   });
 });

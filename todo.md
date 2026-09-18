@@ -85,9 +85,9 @@
 - [ ] Add request IDs and structured request logging.
 - [ ] Implement the protected mock login endpoint and deterministic demo credentials.
 - [ ] Implement authenticated `POST /orders` request validation.
-- [ ] Implement the MongoDB order repository create operation.
+- [x] Implement the MongoDB order repository create operation with an atomic embedded outbox.
 - [ ] Implement authenticated `GET /orders/:id` request validation.
-- [ ] Implement the MongoDB order repository read operation.
+- [x] Implement the MongoDB order repository read operation.
 - [ ] Return consistent 400, 401, 404, and 500 responses.
 - [ ] Add unit tests for order request validation.
 - [ ] Add unit tests for order service business logic.
