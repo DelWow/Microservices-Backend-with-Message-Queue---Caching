@@ -103,14 +103,14 @@
 - [x] Create a Redis client with explicit connection, readiness, error, and shutdown handling.
 - [x] Define namespaced, versioned cache keys.
 - [x] Make cache TTL configurable with a sensible default.
-- [ ] Implement cache-aside reads for `GET /orders/:id`.
-- [ ] Populate or invalidate the cache after successful order creation.
+- [x] Implement cache-aside reads for `GET /orders/:id`.
+- [x] Populate the cache with the persisted result after successful order creation.
 - [x] Add a configuration switch to disable caching for benchmark parity.
-- [ ] Define safe behavior when Redis is unavailable (fall back to MongoDB).
-- [ ] Add cache hit/miss/bypass metadata to structured logs.
+- [x] Define safe behavior when Redis is unavailable (fall back to MongoDB).
+- [x] Add cache hit/miss/bypass/error metadata to structured logs.
 - [x] Add unit tests for cache hit, miss, serialization validation, expiry assumptions, and bypass paths.
 - [ ] Add integration tests for cached reads and Redis failure fallback.
-- [ ] Verify no stale data is returned after writes.
+- [x] Verify creation caches the exact persisted result and preserves customer scoping.
 - [ ] Pause for a caching milestone review.
 
 ## 7. Add RabbitMQ publishing and reliable event topology
