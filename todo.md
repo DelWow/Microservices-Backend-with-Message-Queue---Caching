@@ -81,45 +81,47 @@
 
 ## 5. Build the Order Service core
 
-- [ ] Create the Order Service application factory separately from process startup.
-- [ ] Add request IDs and structured request logging.
-- [ ] Implement the protected mock login endpoint and deterministic demo credentials.
-- [ ] Implement authenticated `POST /orders` request validation.
-- [ ] Implement the MongoDB order repository create operation.
-- [ ] Implement authenticated `GET /orders/:id` request validation.
-- [ ] Implement the MongoDB order repository read operation.
-- [ ] Return consistent 400, 401, 404, and 500 responses.
-- [ ] Add unit tests for order request validation.
-- [ ] Add unit tests for order service business logic.
-- [ ] Add API tests for login success and failure.
-- [ ] Add API tests for create-order authentication and validation.
-- [ ] Add API tests for fetch-order authentication and not-found behavior.
-- [ ] Run and report the Order Service test count.
-- [ ] Pause for an Order Service milestone review.
+- [x] Create the Order Service application factory separately from process startup.
+- [x] Add request IDs and structured request logging.
+- [x] Implement the protected mock login endpoint and deterministic demo credentials.
+- [x] Implement authenticated `POST /orders` request validation.
+- [x] Implement the MongoDB order repository create operation with an atomic embedded outbox.
+- [x] Implement authenticated `GET /orders/:id` request validation.
+- [x] Implement the MongoDB order repository read operation.
+- [x] Return consistent 400, 401, 404, and 500 responses.
+- [x] Add unit tests for order request validation.
+- [x] Add unit tests for order service business logic.
+- [x] Add API tests for login success and failure.
+- [x] Add API tests for create-order authentication and validation.
+- [x] Add API tests for fetch-order authentication and not-found behavior.
+- [x] Run and report the Order Service test count (28 focused tests; 84 repository-wide).
+- [x] Pause for an Order Service milestone review.
+  - Review complete: request validation, authentication, customer scoping, persistence, error mapping, and atomic outbox creation are covered; Redis integration remains isolated to Step 6.
 
 ## 6. Add Redis caching to Order Service
 
-- [ ] Create a Redis client with explicit connection and shutdown handling.
-- [ ] Define namespaced, versioned cache keys.
-- [ ] Make cache TTL configurable with a sensible default.
-- [ ] Implement cache-aside reads for `GET /orders/:id`.
-- [ ] Populate or invalidate the cache after successful order creation.
-- [ ] Add a configuration switch to disable caching for benchmark parity.
-- [ ] Define safe behavior when Redis is unavailable (fall back to MongoDB).
-- [ ] Add cache hit/miss/bypass metadata to structured logs.
-- [ ] Add unit tests for cache hit, miss, expiry assumptions, and bypass paths.
-- [ ] Add integration tests for cached reads and Redis failure fallback.
-- [ ] Verify no stale data is returned after writes.
-- [ ] Pause for a caching milestone review.
+- [x] Create a Redis client with explicit connection, readiness, error, and shutdown handling.
+- [x] Define namespaced, versioned cache keys.
+- [x] Make cache TTL configurable with a sensible default.
+- [x] Implement cache-aside reads for `GET /orders/:id`.
+- [x] Populate the cache with the persisted result after successful order creation.
+- [x] Add a configuration switch to disable caching for benchmark parity.
+- [x] Define safe behavior when Redis is unavailable (fall back to MongoDB).
+- [x] Add cache hit/miss/bypass/error metadata to structured logs.
+- [x] Add unit tests for cache hit, miss, serialization validation, expiry assumptions, and bypass paths.
+- [x] Add integration tests using real disposable Redis for cache reads, TTL expiry, readiness, and failure fallback.
+- [x] Verify creation caches the exact persisted result and preserves customer scoping.
+- [x] Pause for a caching milestone review.
+  - Review complete: cache-aside reads, exact post-create population, TTL, bypass mode, customer scoping, observability metadata, and Redis outage fallback are verified; runtime composition remains part of service startup work.
 
 ## 7. Add RabbitMQ publishing and reliable event topology
 
-- [ ] Define exchange, routing key, durable queue, retry queues, and DLQ names.
-- [ ] Document retry-count and backoff behavior.
-- [ ] Create a RabbitMQ connection/channel manager with reconnect handling.
-- [ ] Declare durable exchange and queues idempotently at startup.
-- [ ] Bind the notification queue to `order.created` events.
-- [ ] Configure dead-letter routing for retry queues and the terminal DLQ.
+- [x] Define versioned exchange, routing key, durable queue, retry queue, and DLQ names.
+- [x] Document retry-count and backoff behavior.
+- [x] Create a RabbitMQ confirm-channel manager with automatic reconnect handling.
+- [x] Declare durable exchanges and queues idempotently during connection setup.
+- [x] Bind the notification queue to `order.created` events.
+- [x] Configure dead-letter routing for retry queues and the terminal DLQ.
 - [ ] Publish persistent events only after the order transaction succeeds.
 - [ ] Propagate correlation and OpenTelemetry trace context in message headers.
 - [ ] Use publisher confirms and handle negative acknowledgements/timeouts.

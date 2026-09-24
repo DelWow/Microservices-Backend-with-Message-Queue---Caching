@@ -20,6 +20,8 @@ jobs:
 
     env:
       MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
+      REDISMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/redis-binaries
+      REDISMS_VERSION: 7.2.7
 
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +33,10 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          path: .cache/mongodb-binaries
-          key: mongodb-binary-${{ runner.os }}-${{ runner.arch }}-v1
+          path: |
+            .cache/mongodb-binaries
+            .cache/redis-binaries
+          key: integration-binaries-${{ runner.os }}-${{ runner.arch }}-mongodb-v1-redis-7.2.7
 
       - run: npm ci
 
