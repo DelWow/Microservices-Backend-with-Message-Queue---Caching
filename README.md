@@ -23,16 +23,18 @@ flowchart LR
 
 Orders embed their items and pending outbox event, making order creation atomic without a transaction. Notification idempotency uses a transaction across `processed_events` and `notifications`; the unique `processed_events.eventId` index detects duplicates through E11000 rather than a pre-read. See [ADR 0003](docs/adr/0003-mongodb-document-model.md).
 
-## Local MongoDB setup
+## Local infrastructure setup
 
 Requirements: Node.js 24+, npm 11+, and Docker with Compose.
 
 ```sh
 cp .env.example .env
-docker compose up -d mongodb mongodb-init
+docker compose up -d mongodb mongodb-init rabbitmq
 ```
 
 The MongoDB service runs as a single-node replica set (`rs0`) because the notification persistence path uses a multi-document transaction. The application URI includes `directConnection=true` so host-side tools can connect even though the replica-set member uses its Compose hostname.
+
+RabbitMQ listens on `localhost:5672`. Its management UI is available at [http://localhost:15672](http://localhost:15672) using the local-only `app` / `app` credentials from Compose.
 
 | Variable                        | Local default                                                     | Purpose                                |
 | ------------------------------- | ----------------------------------------------------------------- | -------------------------------------- |
@@ -69,9 +71,9 @@ npm run typecheck
 npm run build
 ```
 
-Integration tests launch a real disposable single-node MongoDB replica set using `mongodb-memory-server` and a pinned Redis 7.2.7 process using `redis-memory-server`. Downloaded binaries are cached under `.cache/` and are not committed.
+Integration tests launch a real disposable single-node MongoDB replica set using `mongodb-memory-server` and a pinned Redis 7.2.7 process using `redis-memory-server`. When `RABBITMQ_URL` is set, the RabbitMQ integration test creates an order in real MongoDB and verifies its confirmed message through a real broker. CI always enables this test with a RabbitMQ service container. Downloaded binaries are cached under `.cache/` and are not committed.
 
-The current repository has 111 passing tests. CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
+The current repository has 120 passing tests when RabbitMQ is available (119 pass and the broker test is skipped otherwise). CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
 
 ## Messaging reliability
 

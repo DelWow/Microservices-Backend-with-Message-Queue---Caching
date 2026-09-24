@@ -126,7 +126,7 @@
 - [x] Propagate correlation and OpenTelemetry trace context in message headers.
 - [x] Use publisher confirms and handle negative acknowledgements/timeouts.
 - [x] Add tests for event construction and routing metadata.
-- [ ] Add an integration test proving order creation publishes an event.
+- [x] Add an integration test proving order creation publishes an event.
 - [x] Document the consistency limitation or implement an outbox if explicitly chosen.
 
 ## 8. Build the Notification Service consumer
@@ -206,7 +206,7 @@
 - [ ] Add `.dockerignore` files.
 - [x] Define MongoDB with persistent storage, replica-set initialization, and a health check.
 - [ ] Define Redis with persistent storage and a health check.
-- [ ] Define RabbitMQ with the management UI, persistent storage, and a health check.
+- [x] Define RabbitMQ with the management UI, persistent storage, and a health check.
 - [ ] Define Jaeger with OTLP ingestion and its UI port.
 - [ ] Define Order Service with dependency conditions and a real HTTP health check.
 - [ ] Define Notification Service with dependency conditions and a real HTTP health check.
@@ -242,8 +242,8 @@
 - [x] Pin the Node.js major version used by the project.
 - [x] Cache npm dependencies and disposable MongoDB binaries safely.
 - [ ] Start required MongoDB, Redis, and RabbitMQ service containers.
-- [x] Start the MongoDB service container; add Redis and RabbitMQ when their runtime wiring exists.
-- [x] Wait for the MongoDB service-container readiness before integration tests.
+- [x] Start MongoDB and RabbitMQ service containers; add Redis when its CI runtime wiring exists.
+- [x] Wait for MongoDB and RabbitMQ service-container readiness before integration tests.
 - [x] Run deterministic dependency installation.
 - [x] Run formatting check.
 - [x] Run linting.
@@ -292,7 +292,8 @@
 - [ ] Document mock login credentials and API examples.
 - [x] Document MongoDB bootstrap and seed commands.
 - [ ] Document health/readiness URLs and expected responses.
-- [ ] Document RabbitMQ management and Jaeger UI URLs.
+- [ ] Document Jaeger UI URL.
+- [x] Document the RabbitMQ management UI URL and local credentials.
 - [ ] Document the circuit-breaker trip/recovery demo.
 - [ ] Document the poison-message and DLQ demo.
 - [ ] Document graceful-shutdown behavior and demo steps.
