@@ -21,3 +21,7 @@ The primary notification queue also dead-letters rejected messages to the termin
 ## Publishing consistency
 
 Order creation stores its unpublished event in the order document atomically. A separate outbox publisher sends the event with RabbitMQ publisher confirms and marks it published only after confirmation. This preserves the event during broker outages while retaining at-least-once delivery; Notification Service idempotency remains required.
+
+The publisher atomically leases one due event before sending it. Leases expire after 30 seconds so another worker can recover work abandoned by a crashed process. A failed or timed-out confirmation releases the lease, records the error, increments `publishAttempts`, and schedules an exponential retry capped at 60 seconds. Channel backpressure must drain before a confirmed event is marked published.
+
+Messages are persistent and carry the event ID, type, version, correlation ID, publish attempt, and W3C `traceparent`, optional `tracestate`, and optional `baggage` metadata. There is an unavoidable at-least-once window if the process stops after RabbitMQ confirms but before MongoDB records `publishedAt`; consumers must therefore deduplicate by event ID.

@@ -15,6 +15,7 @@ import {
 } from '../packages/platform/src/index.js';
 import { MongoNotificationRepository } from '../services/notification-service/src/index.js';
 import {
+  MongoOrderOutboxRepository,
   MongoOrderRepository,
   type RepositoryOrder,
   type RepositoryOrderCreatedEvent,
@@ -71,12 +72,12 @@ describe('real MongoDB bootstrap', () => {
     const notificationDatabase = connectedClient().db('notifications_bootstrap_test');
 
     await expect(applyBootstrap(orderDatabase, ORDER_BOOTSTRAP)).resolves.toEqual({
-      applied: ['001_collections.json'],
+      applied: ['001_collections.json', '002_outbox_claims.json'],
       skipped: [],
     });
     await expect(applyBootstrap(orderDatabase, ORDER_BOOTSTRAP)).resolves.toEqual({
       applied: [],
-      skipped: ['001_collections.json'],
+      skipped: ['001_collections.json', '002_outbox_claims.json'],
     });
     await applyBootstrap(notificationDatabase, NOTIFICATION_BOOTSTRAP);
 
@@ -93,6 +94,7 @@ describe('real MongoDB bootstrap', () => {
         'orders_customer_created_at',
         'orders_status_created_at',
         'orders_outbox_pending',
+        'orders_outbox_unpublished',
       ]),
     );
     expect(processedEventIndexes).toEqual(
@@ -124,8 +126,8 @@ describe('real MongoDB bootstrap', () => {
     const database = connectedClient().db('bootstrap_missing_test');
     await applyBootstrap(database, ORDER_BOOTSTRAP);
     await database.collection<BootstrapHistoryDocument>('_bootstrap_versions').insertOne({
-      _id: 2,
-      filename: '002_missing.json',
+      _id: 3,
+      filename: '003_missing.json',
       checksum: '0'.repeat(64),
       appliedAt: new Date(),
     });
@@ -243,11 +245,89 @@ describe('MongoDB order repository', () => {
       createdAt: new Date(order.createdAt),
       outbox: {
         eventId: event.eventId,
+        lockedAt: null,
+        lockToken: null,
         publishedAt: null,
         publishAttempts: 0,
         nextAttemptAt: new Date(event.occurredAt),
       },
     });
+  });
+
+  it('claims, retries, and publishes an outbox event atomically', async () => {
+    const database = connectedClient().db('order_outbox_claim_test');
+    await applyBootstrap(database, ORDER_BOOTSTRAP);
+    await new MongoOrderRepository(database).create(order, event);
+    const outbox = new MongoOrderOutboxRepository(database);
+    const initialTime = new Date(event.occurredAt);
+
+    const firstClaim = await outbox.claimNext(initialTime, 'worker-1', 30_000);
+    expect(firstClaim).toMatchObject({
+      event,
+      lockToken: 'worker-1',
+      orderId: order.id,
+      publishAttempts: 0,
+    });
+    await expect(outbox.claimNext(initialTime, 'worker-2', 30_000)).resolves.toBeNull();
+
+    if (firstClaim === null) {
+      throw new Error('Expected the pending outbox event to be claimed');
+    }
+
+    const retryAt = new Date('2026-09-18T12:00:01.000Z');
+    await outbox.markFailed(firstClaim, retryAt, 'broker unavailable');
+    await expect(
+      outbox.claimNext(new Date('2026-09-18T12:00:00.999Z'), 'worker-2', 30_000),
+    ).resolves.toBeNull();
+
+    const retryClaim = await outbox.claimNext(retryAt, 'worker-2', 30_000);
+    expect(retryClaim).toMatchObject({ publishAttempts: 1, lockToken: 'worker-2' });
+
+    if (retryClaim === null) {
+      throw new Error('Expected the failed outbox event to become claimable');
+    }
+
+    const publishedAt = new Date('2026-09-18T12:00:02.000Z');
+    await outbox.markPublished(retryClaim, publishedAt);
+    await expect(
+      outbox.claimNext(new Date('2026-09-18T12:01:00.000Z'), 'worker-3', 30_000),
+    ).resolves.toBeNull();
+    await expect(
+      database.collection<{ _id: string }>('orders').findOne({ _id: order.id }),
+    ).resolves.toMatchObject({
+      outbox: {
+        lastError: null,
+        lockedAt: null,
+        lockToken: null,
+        publishAttempts: 1,
+        publishedAt,
+      },
+    });
+  });
+
+  it('reclaims a stale outbox lease and rejects updates from the old owner', async () => {
+    const database = connectedClient().db('order_outbox_stale_claim_test');
+    await applyBootstrap(database, ORDER_BOOTSTRAP);
+    await new MongoOrderRepository(database).create(order, event);
+    const outbox = new MongoOrderOutboxRepository(database);
+    const firstClaim = await outbox.claimNext(new Date(event.occurredAt), 'worker-1', 30_000);
+    const secondClaim = await outbox.claimNext(
+      new Date('2026-09-18T12:00:30.001Z'),
+      'worker-2',
+      30_000,
+    );
+
+    expect(secondClaim).toMatchObject({ lockToken: 'worker-2' });
+    if (firstClaim === null || secondClaim === null) {
+      throw new Error('Expected both lease claims to succeed');
+    }
+
+    await expect(
+      outbox.markPublished(firstClaim, new Date('2026-09-18T12:00:31.000Z')),
+    ).rejects.toThrow(`Order outbox claim was lost for event ${event.eventId}`);
+    await expect(
+      outbox.markPublished(secondClaim, new Date('2026-09-18T12:00:31.000Z')),
+    ).resolves.toBeUndefined();
   });
 
   it('returns null when an order does not exist', async () => {

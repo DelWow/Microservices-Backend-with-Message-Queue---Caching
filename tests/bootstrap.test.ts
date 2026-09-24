@@ -29,7 +29,10 @@ describe('MongoDB bootstrap file loading', () => {
       resolve('services/notification-service/bootstrap'),
     );
 
-    expect(orders.map((file) => file.filename)).toEqual(['001_collections.json']);
+    expect(orders.map((file) => file.filename)).toEqual([
+      '001_collections.json',
+      '002_outbox_claims.json',
+    ]);
     expect(orders[0]?.specification.collections.map((collection) => collection.name)).toEqual([
       'orders',
     ]);

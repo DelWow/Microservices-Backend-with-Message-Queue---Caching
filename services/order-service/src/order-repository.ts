@@ -53,6 +53,8 @@ interface OrderDocument extends Document {
     readonly publishAttempts: number;
     readonly nextAttemptAt: Date;
     readonly lastError: string | null;
+    readonly lockedAt: Date | null;
+    readonly lockToken: string | null;
   };
 }
 
@@ -102,6 +104,8 @@ export class MongoOrderRepository implements OrderRepository {
         publishAttempts: 0,
         nextAttemptAt: occurredAt,
         lastError: null,
+        lockedAt: null,
+        lockToken: null,
       },
     };
 

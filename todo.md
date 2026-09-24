@@ -122,12 +122,12 @@
 - [x] Declare durable exchanges and queues idempotently during connection setup.
 - [x] Bind the notification queue to `order.created` events.
 - [x] Configure dead-letter routing for retry queues and the terminal DLQ.
-- [ ] Publish persistent events only after the order transaction succeeds.
-- [ ] Propagate correlation and OpenTelemetry trace context in message headers.
-- [ ] Use publisher confirms and handle negative acknowledgements/timeouts.
-- [ ] Add tests for event construction and routing metadata.
+- [x] Publish persistent events only after the order transaction succeeds.
+- [x] Propagate correlation and OpenTelemetry trace context in message headers.
+- [x] Use publisher confirms and handle negative acknowledgements/timeouts.
+- [x] Add tests for event construction and routing metadata.
 - [ ] Add an integration test proving order creation publishes an event.
-- [ ] Document the consistency limitation or implement an outbox if explicitly chosen.
+- [x] Document the consistency limitation or implement an outbox if explicitly chosen.
 
 ## 8. Build the Notification Service consumer
 
