@@ -69,9 +69,9 @@ npm run typecheck
 npm run build
 ```
 
-Integration tests launch a real disposable single-node MongoDB replica set using `mongodb-memory-server`. The downloaded binary is cached under `.cache/mongodb-binaries` and is not committed.
+Integration tests launch a real disposable single-node MongoDB replica set using `mongodb-memory-server` and a pinned Redis 7.2.7 process using `redis-memory-server`. Downloaded binaries are cached under `.cache/` and are not committed.
 
-The current repository has 106 passing tests. CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
+The current repository has 107 passing tests. CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
 
 ## Database tracing
 

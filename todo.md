@@ -109,9 +109,10 @@
 - [x] Define safe behavior when Redis is unavailable (fall back to MongoDB).
 - [x] Add cache hit/miss/bypass/error metadata to structured logs.
 - [x] Add unit tests for cache hit, miss, serialization validation, expiry assumptions, and bypass paths.
-- [ ] Add integration tests for cached reads and Redis failure fallback.
+- [x] Add integration tests using real disposable Redis for cache reads, TTL expiry, readiness, and failure fallback.
 - [x] Verify creation caches the exact persisted result and preserves customer scoping.
-- [ ] Pause for a caching milestone review.
+- [x] Pause for a caching milestone review.
+  - Review complete: cache-aside reads, exact post-create population, TTL, bypass mode, customer scoping, observability metadata, and Redis outage fallback are verified; runtime composition remains part of service startup work.
 
 ## 7. Add RabbitMQ publishing and reliable event topology
 

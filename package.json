@@ -9,6 +9,10 @@
     "npm": ">=11.0.0"
   },
   "packageManager": "npm@11.17.0",
+  "redisMemoryServer": {
+    "downloadDir": ".cache/redis-binaries",
+    "version": "7.2.7"
+  },
   "workspaces": [
     "services/*",
     "packages/*"
@@ -35,6 +39,7 @@
     "eslint": "10.10.0",
     "mongodb-memory-server": "^11.2.0",
     "prettier": "3.9.6",
+    "redis-memory-server": "^0.17.1",
     "tsx": "^4.23.13",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.0",
