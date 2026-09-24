@@ -116,12 +116,12 @@
 
 ## 7. Add RabbitMQ publishing and reliable event topology
 
-- [ ] Define exchange, routing key, durable queue, retry queues, and DLQ names.
-- [ ] Document retry-count and backoff behavior.
-- [ ] Create a RabbitMQ connection/channel manager with reconnect handling.
-- [ ] Declare durable exchange and queues idempotently at startup.
-- [ ] Bind the notification queue to `order.created` events.
-- [ ] Configure dead-letter routing for retry queues and the terminal DLQ.
+- [x] Define versioned exchange, routing key, durable queue, retry queue, and DLQ names.
+- [x] Document retry-count and backoff behavior.
+- [x] Create a RabbitMQ confirm-channel manager with automatic reconnect handling.
+- [x] Declare durable exchanges and queues idempotently during connection setup.
+- [x] Bind the notification queue to `order.created` events.
+- [x] Configure dead-letter routing for retry queues and the terminal DLQ.
 - [ ] Publish persistent events only after the order transaction succeeds.
 - [ ] Propagate correlation and OpenTelemetry trace context in message headers.
 - [ ] Use publisher confirms and handle negative acknowledgements/timeouts.

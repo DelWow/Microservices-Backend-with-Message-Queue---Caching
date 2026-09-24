@@ -5,4 +5,6 @@ export * from './jwt.js';
 export * from './logger.js';
 export * from './mongodb-telemetry.js';
 export * from './mongodb.js';
+export * from './rabbitmq-topology.js';
+export * from './rabbitmq.js';
 export * from './redis.js';

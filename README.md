@@ -71,7 +71,11 @@ npm run build
 
 Integration tests launch a real disposable single-node MongoDB replica set using `mongodb-memory-server` and a pinned Redis 7.2.7 process using `redis-memory-server`. Downloaded binaries are cached under `.cache/` and are not committed.
 
-The current repository has 107 passing tests. CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
+The current repository has 111 passing tests. CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
+
+## Messaging reliability
+
+RabbitMQ topology names are versioned and declared idempotently whenever the recovering connection establishes a confirm channel. Notification delivery uses three bounded retry delays followed by a terminal dead-letter queue. See the [retry and dead-letter policy](docs/rabbitmq-retry-policy.md).
 
 ## Database tracing
 
