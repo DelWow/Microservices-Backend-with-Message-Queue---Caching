@@ -12,6 +12,8 @@
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@microservices/contracts": "*",
+    "amqplib": "^2.0.1",
     "mongodb": "^7.6.0"
   }
 }

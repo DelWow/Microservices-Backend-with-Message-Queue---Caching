@@ -122,30 +122,30 @@
 - [x] Declare durable exchanges and queues idempotently during connection setup.
 - [x] Bind the notification queue to `order.created` events.
 - [x] Configure dead-letter routing for retry queues and the terminal DLQ.
-- [ ] Publish persistent events only after the order transaction succeeds.
-- [ ] Propagate correlation and OpenTelemetry trace context in message headers.
-- [ ] Use publisher confirms and handle negative acknowledgements/timeouts.
-- [ ] Add tests for event construction and routing metadata.
-- [ ] Add an integration test proving order creation publishes an event.
-- [ ] Document the consistency limitation or implement an outbox if explicitly chosen.
+- [x] Publish persistent events only after the order transaction succeeds.
+- [x] Propagate correlation and OpenTelemetry trace context in message headers.
+- [x] Use publisher confirms and handle negative acknowledgements/timeouts.
+- [x] Add tests for event construction and routing metadata.
+- [x] Add an integration test proving order creation publishes an event.
+- [x] Document the consistency limitation or implement an outbox if explicitly chosen.
 
 ## 8. Build the Notification Service consumer
 
-- [ ] Create the Notification Service application factory separately from process startup.
+- [x] Create the Notification Service application factory separately from process startup.
 - [ ] Add protected business/demo endpoint(s) if confirmed.
 - [ ] Start the RabbitMQ consumer only after dependencies are ready.
-- [ ] Validate incoming event envelopes and supported versions.
-- [ ] Implement simulated notification delivery with structured logs.
-- [ ] Make event handling idempotent using the unique processed-event record.
-- [ ] Ensure the notification action and idempotency record have safe transaction semantics.
-- [ ] Acknowledge messages only after successful processing.
-- [ ] Detect duplicate deliveries and acknowledge them without duplicate notification work.
+- [x] Validate incoming event envelopes and supported versions.
+- [x] Implement simulated notification delivery with structured logs.
+- [x] Make event handling idempotent using the unique processed-event record.
+- [x] Ensure the notification action and idempotency record have safe transaction semantics.
+- [x] Acknowledge messages only after successful processing.
+- [x] Detect duplicate deliveries and acknowledge them without duplicate notification work.
 - [ ] Add configurable failure, delay, and poison-message simulation controls.
 - [ ] Route retryable failures through bounded retry queues.
 - [ ] Route exhausted or invalid/poison messages to the terminal DLQ.
 - [ ] Record retry attempt and failure reason in logs and headers.
-- [ ] Add unit tests for successful consumption.
-- [ ] Add unit tests for duplicate event handling.
+- [x] Add unit tests for successful consumption.
+- [x] Add unit tests for duplicate event handling.
 - [ ] Add unit tests for retry classification and exhaustion.
 - [ ] Add an integration test proving a created order is consumed once.
 - [ ] Add an integration test proving a poison message reaches the DLQ.
@@ -206,7 +206,7 @@
 - [ ] Add `.dockerignore` files.
 - [x] Define MongoDB with persistent storage, replica-set initialization, and a health check.
 - [ ] Define Redis with persistent storage and a health check.
-- [ ] Define RabbitMQ with the management UI, persistent storage, and a health check.
+- [x] Define RabbitMQ with the management UI, persistent storage, and a health check.
 - [ ] Define Jaeger with OTLP ingestion and its UI port.
 - [ ] Define Order Service with dependency conditions and a real HTTP health check.
 - [ ] Define Notification Service with dependency conditions and a real HTTP health check.
@@ -242,8 +242,8 @@
 - [x] Pin the Node.js major version used by the project.
 - [x] Cache npm dependencies and disposable MongoDB binaries safely.
 - [ ] Start required MongoDB, Redis, and RabbitMQ service containers.
-- [x] Start the MongoDB service container; add Redis and RabbitMQ when their runtime wiring exists.
-- [x] Wait for the MongoDB service-container readiness before integration tests.
+- [x] Start MongoDB and RabbitMQ service containers; add Redis when its CI runtime wiring exists.
+- [x] Wait for MongoDB and RabbitMQ service-container readiness before integration tests.
 - [x] Run deterministic dependency installation.
 - [x] Run formatting check.
 - [x] Run linting.
@@ -292,7 +292,8 @@
 - [ ] Document mock login credentials and API examples.
 - [x] Document MongoDB bootstrap and seed commands.
 - [ ] Document health/readiness URLs and expected responses.
-- [ ] Document RabbitMQ management and Jaeger UI URLs.
+- [ ] Document Jaeger UI URL.
+- [x] Document the RabbitMQ management UI URL and local credentials.
 - [ ] Document the circuit-breaker trip/recovery demo.
 - [ ] Document the poison-message and DLQ demo.
 - [ ] Document graceful-shutdown behavior and demo steps.
