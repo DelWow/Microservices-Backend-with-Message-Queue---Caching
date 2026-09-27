@@ -73,7 +73,7 @@ npm run build
 
 Integration tests launch a real disposable single-node MongoDB replica set using `mongodb-memory-server` and a pinned Redis 7.2.7 process using `redis-memory-server`. When `RABBITMQ_URL` is set, the RabbitMQ integration test creates an order in real MongoDB and verifies its confirmed message through a real broker. CI always enables this test with a RabbitMQ service container. Downloaded binaries are cached under `.cache/` and are not committed.
 
-The current repository has 120 passing tests when RabbitMQ is available (119 pass and the broker test is skipped otherwise). CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
+The current repository has 126 passing tests when RabbitMQ is available (125 pass and the broker test is skipped otherwise). CI runs the formatting check, lint, type-check, build, and coverage-enabled full test suite on every push and pull request.
 
 ## Messaging reliability
 

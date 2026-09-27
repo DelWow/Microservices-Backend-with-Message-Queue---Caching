@@ -18,7 +18,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace @microservices/contracts && npm run build --workspace @microservices/platform && npm run build --workspace @microservices/notification-service && npm run build --workspace @microservices/order-service",
     "clean": "npm run clean --workspaces --if-present",
     "db:bootstrap": "npm run db:bootstrap --workspaces --if-present",
     "db:seed": "node --import tsx scripts/seed-mongodb.ts",
@@ -28,7 +28,7 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "npm run typecheck:root && npm run typecheck:workspaces",
+    "typecheck": "npm run build --workspace @microservices/contracts && npm run typecheck:root && npm run typecheck:workspaces",
     "typecheck:root": "tsc --project tsconfig.json --noEmit",
     "typecheck:workspaces": "npm run typecheck --workspaces --if-present"
   },

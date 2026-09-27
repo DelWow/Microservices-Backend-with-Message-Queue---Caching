@@ -131,21 +131,21 @@
 
 ## 8. Build the Notification Service consumer
 
-- [ ] Create the Notification Service application factory separately from process startup.
+- [x] Create the Notification Service application factory separately from process startup.
 - [ ] Add protected business/demo endpoint(s) if confirmed.
 - [ ] Start the RabbitMQ consumer only after dependencies are ready.
-- [ ] Validate incoming event envelopes and supported versions.
-- [ ] Implement simulated notification delivery with structured logs.
-- [ ] Make event handling idempotent using the unique processed-event record.
-- [ ] Ensure the notification action and idempotency record have safe transaction semantics.
-- [ ] Acknowledge messages only after successful processing.
-- [ ] Detect duplicate deliveries and acknowledge them without duplicate notification work.
+- [x] Validate incoming event envelopes and supported versions.
+- [x] Implement simulated notification delivery with structured logs.
+- [x] Make event handling idempotent using the unique processed-event record.
+- [x] Ensure the notification action and idempotency record have safe transaction semantics.
+- [x] Acknowledge messages only after successful processing.
+- [x] Detect duplicate deliveries and acknowledge them without duplicate notification work.
 - [ ] Add configurable failure, delay, and poison-message simulation controls.
 - [ ] Route retryable failures through bounded retry queues.
 - [ ] Route exhausted or invalid/poison messages to the terminal DLQ.
 - [ ] Record retry attempt and failure reason in logs and headers.
-- [ ] Add unit tests for successful consumption.
-- [ ] Add unit tests for duplicate event handling.
+- [x] Add unit tests for successful consumption.
+- [x] Add unit tests for duplicate event handling.
 - [ ] Add unit tests for retry classification and exhaustion.
 - [ ] Add an integration test proving a created order is consumed once.
 - [ ] Add an integration test proving a poison message reaches the DLQ.
